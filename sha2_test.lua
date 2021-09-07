@@ -321,6 +321,8 @@ local function test_sha3()
    assert(sha.shake128(12, "The quick brown fox jumps over the lazy dog") == "f4202e3c5852f9182a0430fd")
    assert(sha.shake128(11, "The quick brown fox jumps over the lazy dog") == "f4202e3c5852f9182a0430")
    assert(sha.shake128(0,  "The quick brown fox jumps over the lazy dog") == "")
+   
+   assert(sha.keccak_256"testing" == "5f16f4c7f149ac4f9510d9cf8cf384038ad348b3bcdc01915f95de12df9d1b02")
 
    -- digest_size_in_bytes == (-1) means "generate infinite SHAKE-stream instead of fixed-width digest"
    local get_next_part_of_digest = sha.shake128(-1, "The quick brown fox jumps over the lazy dog")
