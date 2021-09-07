@@ -2669,7 +2669,7 @@ local function sha1(message)
 end
 
 
-local function keccak(block_size_in_bytes, digest_size_in_bytes, is_SHAKE, message)
+local function keccak(block_size_in_bytes, digest_size_in_bytes, template, message)
    -- "block_size_in_bytes" is multiple of 8
    if type(digest_size_in_bytes) ~= "number" then
       -- arguments in SHAKE are swapped:
@@ -2716,7 +2716,12 @@ local function keccak(block_size_in_bytes, digest_size_in_bytes, is_SHAKE, messa
       else
          if tail then
             -- append the following bits to the message: for usual SHA3: 011(0*)1, for SHAKE: 11111(0*)1
-            local gap_start = is_SHAKE and 31 or 6
+            local gap_start = 6
+            if template == true then
+               gap_start = 31
+            elseif template == "keccak" then
+               gap_start = 1
+            end
             tail = tail..(#tail + 1 == block_size_in_bytes and char(gap_start + 128) or char(gap_start)..string_rep("\0", (-2 - #tail) % block_size_in_bytes).."\128")
             keccak_feed(lanes_lo, lanes_hi, tail, 0, #tail, block_size_in_bytes)
             tail = nil
@@ -2935,6 +2940,7 @@ local sha = {
    sha3_512   = function (message)                       return keccak((1600 - 2 * 512) / 8, 512 / 8, false, message)             end, -- SHA3-512
    shake128   = function (digest_size_in_bytes, message) return keccak((1600 - 2 * 128) / 8, digest_size_in_bytes, true, message) end, -- SHAKE128
    shake256   = function (digest_size_in_bytes, message) return keccak((1600 - 2 * 256) / 8, digest_size_in_bytes, true, message) end, -- SHAKE256
+   keccak_256 = function (digest_size_in_bytes, message) return keccak((1600 - 2 * 256) / 8, 256 / 8, "keccak", message)          end, -- https://www.cybertest.com/blog/keccak-vs-sha3
    -- misc utilities:
    hmac       = hmac,       -- HMAC(hash_func, key, message) is applicable to any hash function from this module except SHAKE*
    hex2bin    = hex2bin,    -- converts hexadecimal representation to binary string
@@ -2954,6 +2960,7 @@ block_size_for_HMAC = {
    [sha.sha512]     = 128,
    [sha.sha3_224]   = (1600 - 2 * 224) / 8,
    [sha.sha3_256]   = (1600 - 2 * 256) / 8,
+   [sha.keccak_256] = (1600 - 2 * 256) / 8,
    [sha.sha3_384]   = (1600 - 2 * 384) / 8,
    [sha.sha3_512]   = (1600 - 2 * 512) / 8,
 }
