@@ -30,6 +30,7 @@ SHA-512/256    -- sha.sha512_256(message)
 -- SHA3
 SHA3-224       -- sha.sha3_224(message)
 SHA3-256       -- sha.sha3_256(message)
+KECCAK-256     -- sha.keccak_256(message)
 SHA3-384       -- sha.sha3_384(message)
 SHA3-512       -- sha.sha3_512(message)
 SHAKE128       -- sha.shake128(digest_size_in_bytes, message)
